@@ -43,7 +43,7 @@
           <div class="text-4xl font-display tracking-wider text-brand-400 mb-1">{{ global_taux }}%</div>
           <div class="text-slate-400 text-sm">Taux de réussite</div>
           <div class="mt-3 h-1.5 bg-slate-700 rounded-full overflow-hidden">
-            <div class="h-full bg-gradient-to-r from-brand-600 to-brand-400 rounded-full" style="width: {{ global_taux }}%"></div>
+            <div class="h-full bg-gradient-to-r from-brand-600 to-brand-400 rounded-full js-progress-bar" data-progress="{{ global_taux }}"></div>
           </div>
         </div>
         <div class="bg-dark-800/60 border border-slate-700 rounded-2xl p-6 card-hover mt-6">
@@ -183,5 +183,12 @@
   </div>
 </section>
 {% endif %}
+
+<script>
+  document.querySelectorAll('.js-progress-bar').forEach((bar) => {
+    const progress = Math.max(0, Math.min(100, Number(bar.dataset.progress) || 0));
+    bar.style.width = `${progress}%`;
+  });
+</script>
 
 {% endblock %}
