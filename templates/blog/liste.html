@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load icons %}
+{% block title %}Blog — PronosPlatform{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-10">
+  <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="font-display text-4xl tracking-wider text-white">BLOG</h1>
+      <p class="text-slate-400 text-sm mt-1">Guides, stratégies et analyses pour mieux parier</p>
+    </div>
+    <form method="get" class="flex gap-2">
+      <input type="text" name="q" value="{{ search }}" placeholder="Rechercher un article…"
+             class="px-4 py-2 bg-dark-800 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 w-56">
+      <button type="submit" class="px-3 py-2 bg-brand-600 text-white rounded-xl text-sm">{% icon "search" "w-4 h-4" %}</button>
+    </form>
+  </div>
+
+  <!-- Catégories -->
+  {% if categories %}
+    <div class="flex gap-2 flex-wrap mb-6">
+      <a href="{% url 'blog:liste' %}" class="px-3 py-1 rounded-lg text-xs {% if not categorie_active %}bg-brand-600 text-white{% else %}bg-dark-800 text-slate-400 border border-slate-700{% endif %}">Tous</a>
+      {% for cat in categories %}
+        <a href="?categorie={{ cat.slug }}" 
+           class="px-3 py-1 rounded-lg text-xs border transition-all {% if categorie_active == cat.slug %}text-white{% else %}bg-dark-800 text-slate-400 border-slate-700 hover:border-slate-500{% endif %}"
+           style="{% if categorie_active == cat.slug %}background: {{ cat.couleur }}; border-color: {{ cat.couleur }}{% endif %}">
+          {{ cat.nom }}
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for article in page_obj %}
+      <article class="bg-dark-800/60 border border-slate-700 rounded-2xl overflow-hidden card-hover flex flex-col">
+        {% if article.image_principale %}
+          <div class="h-44 overflow-hidden">
+            <img src="{{ article.image_principale.url }}" alt="{{ article.titre }}" class="w-full h-full object-cover">
+          </div>
+        {% else %}
+          <div class="h-44 bg-gradient-to-br from-slate-800 to-dark-900 flex items-center justify-center">{% icon "edit" "w-12 h-12" %}</div>
+        {% endif %}
+        <div class="p-5 flex flex-col flex-1">
+          {% if article.categorie %}
+            <span class="inline-block text-xs font-medium px-2.5 py-1 rounded-full mb-3" style="background: {{ article.categorie.couleur }}22; color: {{ article.categorie.couleur }}; border: 1px solid {{ article.categorie.couleur }}44">
+              {{ article.categorie.nom }}
+            </span>
+          {% endif %}
+          <h2 class="font-bold text-white mb-2 line-clamp-2 flex-1">
+            <a href="{{ article.get_absolute_url }}" class="hover:text-brand-400 transition-colors">{{ article.titre }}</a>
+          </h2>
+          <p class="text-slate-400 text-sm line-clamp-3 mb-4">{{ article.extrait }}</p>
+          <div class="flex items-center justify-between mt-auto pt-3 border-t border-slate-700/50">
+            <div class="text-xs text-slate-500 inline-flex items-center gap-1">{{ article.published_at|date:"d/m/Y" }} / {% icon "view" "w-3 h-3" %} {{ article.vues }}</div>
+            <a href="{{ article.get_absolute_url }}" class="text-xs text-brand-400 hover:text-brand-300 font-medium">Lire →</a>
+          </div>
+        </div>
+      </article>
+    {% empty %}
+      <div class="col-span-3 text-center py-16 text-slate-500">
+        <div class="flex justify-center text-slate-500 mb-4">{% icon "edit" "w-12 h-12" %}</div>
+        <p>Aucun article trouvé.</p>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+    <div class="flex justify-center gap-2 mt-8">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-dark-800 border border-slate-700 rounded-xl text-sm text-slate-300 hover:border-brand-500 transition-colors">← Précédent</a>
+      {% endif %}
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-dark-800 border border-slate-700 rounded-xl text-sm text-slate-300 hover:border-brand-500 transition-colors">Suivant →</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

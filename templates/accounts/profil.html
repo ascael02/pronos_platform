@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load icons %}
+{% block title %}Mon profil — PronosPlatform{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-10">
+  <h1 class="font-display text-3xl tracking-wider text-white mb-8">MON PROFIL</h1>
+
+  <div class="grid gap-6">
+    <!-- Photo et infos rapides -->
+    <div class="bg-dark-800/60 border border-slate-700 rounded-2xl p-6 flex items-center gap-5">
+      <div class="relative">
+        <img src="{{ user.avatar_url }}" alt="Avatar" class="w-20 h-20 rounded-full object-cover border-2 border-slate-600">
+        {% if user_is_vip %}
+          <span class="absolute -top-1 -right-1 text-yellow-400">{% icon "crown" "w-5 h-5" %}</span>
+        {% endif %}
+      </div>
+      <div>
+        <div class="font-bold text-white text-xl">{{ user.username }}</div>
+        <div class="text-slate-400 text-sm">{{ user.email }}</div>
+        <div class="mt-2 flex items-center gap-2">
+          {% if user_is_vip %}
+            <span class="badge-vip text-xs px-2.5 py-1 rounded-full font-bold inline-flex items-center gap-1">{% icon "crown" "w-3 h-3" %} VIP actif jusqu'au {{ vip_expiry|date:"d/m/Y" }}</span>
+          {% else %}
+            <span class="text-xs px-2.5 py-1 rounded-full bg-slate-700 text-slate-400">Plan Gratuit</span>
+            <a href="{% url 'vip:landing' %}" class="text-xs text-yellow-400 hover:text-yellow-300">Passer VIP →</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulaire modification -->
+    <div class="bg-dark-800/60 border border-slate-700 rounded-2xl p-6">
+      <h2 class="font-semibold text-white mb-5 flex items-center gap-2">{% icon "edit" "w-5 h-5" %} Modifier mes informations</h2>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {% for field in form %}
+            <div class="{% if field.name == 'bio' %}md:col-span-2{% endif %}">
+              <label class="block text-sm font-medium text-slate-300 mb-1.5">{{ field.label }}</label>
+              {% if field.field.widget.input_type == 'checkbox' %}
+                <div class="flex items-center gap-2">
+                  {{ field }}
+                  <span class="text-sm text-slate-400">{{ field.label }}</span>
+                </div>
+              {% elif field.name == 'avatar' %}
+                <div class="flex items-center gap-3">
+                  {{ field }}
+                </div>
+              {% else %}
+                <input type="{{ field.field.widget.input_type }}" name="{{ field.html_name }}"
+                       value="{% if field.value %}{{ field.value }}{% endif %}"
+                       class="w-full px-4 py-3 bg-dark-900 border {% if field.errors %}border-red-500{% else %}border-slate-700{% endif %} rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors
+                              {% if field.name == 'bio' %}min-h-[80px]{% endif %}"
+                       {% if field.name == 'bio' %}{% endif %}>
+              {% endif %}
+              {% for err in field.errors %}
+                <p class="mt-1 text-xs text-red-400">{{ err }}</p>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+        <div class="flex gap-3 mt-6">
+          <button type="submit" class="px-6 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-semibold transition-colors">
+            Sauvegarder
+          </button>
+          <a href="{% url 'accounts:changer_mdp' %}" class="px-6 py-3 border border-slate-600 text-slate-300 hover:border-slate-500 rounded-xl text-sm transition-colors">
+            Changer le mot de passe
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

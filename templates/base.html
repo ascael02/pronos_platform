@@ -1,0 +1,196 @@
+{% load icons %}
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}PronosPlatform — Pronostics Sportifs{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}La plateforme de pronostics sportifs #1 en Afrique de l'Ouest.{% endblock %}">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#f0fdf4', 400:'#4ade80', 500:'#22c55e', 600:'#16a34a', 900:'#14532d' },
+            dark:  { 800:'#1e293b', 900:'#0f172a', 950:'#020617' },
+          },
+          fontFamily: {
+            display: ['"Bebas Neue"', 'Impact', 'sans-serif'],
+            body: ['"DM Sans"', 'system-ui', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'DM Sans', sans-serif; background: #0f172a; color: #e2e8f0; }
+    .font-display { font-family: 'Bebas Neue', Impact, sans-serif; }
+    .glow-green { box-shadow: 0 0 20px rgba(34,197,94,0.3); }
+    .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+    .badge-win { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+    .badge-loss { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+    .badge-pending { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+    .badge-vip { background: linear-gradient(135deg,#f59e0b,#d97706); color: #fff; }
+    .nav-link { transition: color 0.15s; }
+    .nav-link:hover { color: #22c55e; }
+    ::-webkit-scrollbar { width: 6px; } 
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+  </style>
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body class="min-h-screen flex flex-col bg-dark-950">
+
+  <!-- ═══ NAVBAR ═══════════════════════════════════════════════════════════ -->
+  <nav class="sticky top-0 z-50 border-b border-slate-800 bg-dark-900/95 backdrop-blur-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+
+        <!-- Logo -->
+        <a href="{% url 'pronostics:home' %}" class="flex items-center gap-2 group">
+          <span class="text-brand-500">{% icon "target" "w-7 h-7" %}</span>
+          <span class="font-display text-2xl tracking-wider text-white group-hover:text-brand-400 transition-colors">
+            PRONOS<span class="text-brand-500">PLATFORM</span>
+          </span>
+        </a>
+
+        <!-- Stats bar (desktop) -->
+        <div class="hidden lg:flex items-center gap-6 text-sm">
+          <div class="flex items-center gap-1.5 text-slate-400">
+            <span class="text-brand-400 font-semibold">{{ global_taux }}%</span>
+            <span>de réussite</span>
+          </div>
+          <div class="w-px h-4 bg-slate-700"></div>
+          <div class="flex items-center gap-1.5 text-slate-400">
+            <span class="text-white font-semibold">{{ global_total }}</span>
+            <span>pronostics</span>
+          </div>
+        </div>
+
+        <!-- Nav links -->
+        <div class="hidden md:flex items-center gap-6 text-sm font-medium">
+          <a href="{% url 'pronostics:liste' %}" class="nav-link text-slate-300">Pronostics</a>
+          <a href="{% url 'pronostics:stats' %}" class="nav-link text-slate-300">Stats</a>
+          <a href="{% url 'bookmakers:liste' %}" class="nav-link text-slate-300">Bookmakers</a>
+          <a href="{% url 'blog:liste' %}" class="nav-link text-slate-300">Blog</a>
+          <a href="{% url 'vip:landing' %}" class="flex items-center gap-1 px-3 py-1.5 rounded-full badge-vip text-xs font-bold hover:opacity-90 transition-opacity">
+            {% icon "crown" "w-4 h-4" %} VIP
+          </a>
+        </div>
+
+        <!-- Auth -->
+        <div class="flex items-center gap-3">
+          {% if user.is_authenticated %}
+            <div class="relative group">
+              <button class="flex items-center gap-2 text-sm text-slate-300 hover:text-white transition-colors">
+                <img src="{{ user.avatar_url }}" alt="avatar" class="w-8 h-8 rounded-full object-cover border border-slate-600">
+                <span class="hidden md:block">{{ user.username }}</span>
+                {% if user_is_vip %}
+                  <span class="text-xs badge-vip px-1.5 py-0.5 rounded-full">VIP</span>
+                {% endif %}
+              </button>
+              <div class="absolute right-0 mt-2 w-48 bg-dark-800 border border-slate-700 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <a href="{% url 'pronostics:dashboard' %}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-t-xl">{% icon "home" "w-4 h-4" %} Dashboard</a>
+                <a href="{% url 'accounts:profil' %}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50">{% icon "user" "w-4 h-4" %} Mon profil</a>
+                {% if user.is_staff %}
+                  <a href="/admin/" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50">{% icon "dashboard" "w-4 h-4" %} Administration</a>
+                {% endif %}
+                <hr class="border-slate-700">
+                <a href="{% url 'accounts:deconnexion' %}" class="block px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-slate-700/50 rounded-b-xl">↩ Déconnexion</a>
+              </div>
+            </div>
+          {% else %}
+            <a href="{% url 'accounts:connexion' %}" class="text-sm text-slate-300 hover:text-white nav-link">Connexion</a>
+            <a href="{% url 'accounts:inscription' %}" class="text-sm bg-brand-600 hover:bg-brand-500 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+              S'inscrire
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ MESSAGES ════════════════════════════════════════════════════════ -->
+  {% if messages %}
+    <div class="max-w-7xl mx-auto px-4 pt-4 space-y-2">
+      {% for msg in messages %}
+        <div class="flex items-center gap-3 px-4 py-3 rounded-xl border text-sm
+          {% if msg.tags == 'success' %}bg-green-900/40 border-green-700 text-green-300
+          {% elif msg.tags == 'error' %}bg-red-900/40 border-red-700 text-red-300
+          {% elif msg.tags == 'warning' %}bg-yellow-900/40 border-yellow-700 text-yellow-300
+          {% else %}bg-blue-900/40 border-blue-700 text-blue-300{% endif %}">
+          {% if msg.tags == 'success' %}{% icon "check" "w-4 h-4" %}{% elif msg.tags == 'error' %}{% icon "x" "w-4 h-4" %}{% else %}{% icon "info" "w-4 h-4" %}{% endif %}
+          {{ msg }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- ═══ CONTENU PRINCIPAL ════════════════════════════════════════════════ -->
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ═══ FOOTER ═══════════════════════════════════════════════════════════ -->
+  <footer class="border-t border-slate-800 bg-dark-900 mt-16">
+    <div class="max-w-7xl mx-auto px-4 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <div class="font-display text-2xl tracking-wider mb-3">
+            PRONOS<span class="text-brand-500">PLATFORM</span>
+          </div>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            La plateforme de pronostics sportifs #1 en Afrique de l'Ouest. Analyses expertes et transparence totale.
+          </p>
+        </div>
+        <div>
+          <h3 class="font-semibold text-white mb-3">Navigation</h3>
+          <ul class="space-y-2 text-sm text-slate-400">
+            <li><a href="{% url 'pronostics:liste' %}" class="hover:text-brand-400 transition-colors">Pronostics</a></li>
+            <li><a href="{% url 'pronostics:stats' %}" class="hover:text-brand-400 transition-colors">Statistiques</a></li>
+            <li><a href="{% url 'blog:liste' %}" class="hover:text-brand-400 transition-colors">Blog</a></li>
+            <li><a href="{% url 'vip:landing' %}" class="hover:text-brand-400 transition-colors">Devenir VIP</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-white mb-3">Bookmakers</h3>
+          <ul class="space-y-2 text-sm text-slate-400">
+            <li><a href="{% url 'bookmakers:liste' %}" class="hover:text-brand-400 transition-colors">Comparatif</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-white mb-3">Légal</h3>
+          <p class="text-slate-500 text-xs leading-relaxed">
+            Les pronostics sportifs ne garantissent pas de gains. Jouez de façon responsable. 18+
+          </p>
+          <div class="mt-4 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+            <span class="text-xs text-slate-400">Données en temps réel</span>
+          </div>
+        </div>
+      </div>
+      <div class="mt-8 pt-6 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+        <p class="text-slate-500 text-sm">© 2024 PronosPlatform. Tous droits réservés.</p>
+        <div class="flex items-center gap-4 text-sm text-slate-500">
+          <span>Cotonou, Bénin</span>
+          <span>•</span>
+          <a href="{% url 'api-docs' %}" class="hover:text-brand-400 transition-colors">API</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load icons %}
+{% block title %}Devenir VIP - PronosPlatform{% endblock %}
+
+{% block content %}
+<section class="relative py-20 overflow-hidden">
+  <div class="absolute inset-0" style="background: radial-gradient(ellipse at 50% 0%, rgba(245,158,11,0.12) 0%, transparent 70%)"></div>
+  <div class="relative max-w-4xl mx-auto px-4 text-center">
+    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 text-xs font-medium mb-6">
+      {% icon "crown" "w-4 h-4" %} Acces Exclusif
+    </div>
+    <h1 class="font-display text-5xl lg:text-7xl tracking-wider text-white mb-4">
+      PASSEZ <span class="text-yellow-400">VIP</span>
+    </h1>
+    <p class="text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed">
+      Accedez aux meilleures analyses, pronostics exclusifs et au suivi personnalise de nos experts pour maximiser vos gains.
+    </p>
+  </div>
+</section>
+
+<section class="py-12">
+  <div class="max-w-5xl mx-auto px-4">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
+      <div class="bg-dark-800/60 border border-slate-700 rounded-2xl p-5 text-center">
+        <div class="flex justify-center text-yellow-400 mb-3">{% icon "diamond" "w-8 h-8" %}</div>
+        <div class="font-medium text-white text-sm">Analyses exclusives</div>
+        <p class="text-slate-500 text-xs mt-1">Acces a l'integralite des analyses d'experts</p>
+      </div>
+      <div class="bg-dark-800/60 border border-slate-700 rounded-2xl p-5 text-center">
+        <div class="flex justify-center text-yellow-400 mb-3">{% icon "bell" "w-8 h-8" %}</div>
+        <div class="font-medium text-white text-sm">Alertes instantanees</div>
+        <p class="text-slate-500 text-xs mt-1">Notifications des qu'un pronostic VIP est publie</p>
+      </div>
+      <div class="bg-dark-800/60 border border-slate-700 rounded-2xl p-5 text-center">
+        <div class="flex justify-center text-yellow-400 mb-3">{% icon "chart" "w-8 h-8" %}</div>
+        <div class="font-medium text-white text-sm">Statistiques avancees</div>
+        <p class="text-slate-500 text-xs mt-1">Tableau de bord complet de vos performances</p>
+      </div>
+      <div class="bg-dark-800/60 border border-slate-700 rounded-2xl p-5 text-center">
+        <div class="flex justify-center text-yellow-400 mb-3">{% icon "target" "w-8 h-8" %}</div>
+        <div class="font-medium text-white text-sm">+75% de reussite</div>
+        <p class="text-slate-500 text-xs mt-1">Nos pronostics VIP affichent un taux superieur</p>
+      </div>
+    </div>
+
+    <h2 class="font-display text-3xl tracking-wider text-white text-center mb-8">CHOISISSEZ VOTRE PLAN</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {% for plan in plans %}
+        <div class="relative bg-dark-800/60 border {% if plan.populaire %}border-yellow-500 shadow-lg shadow-yellow-500/10{% else %}border-slate-700{% endif %} rounded-2xl p-6 flex flex-col">
+          {% if plan.populaire %}
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-yellow-500 text-dark-950 rounded-full text-xs font-bold inline-flex items-center gap-1">
+              {% icon "star" "w-3 h-3" %} LE PLUS POPULAIRE
+            </div>
+          {% endif %}
+
+          <div class="mb-6">
+            <h3 class="font-bold text-white text-lg mb-1">{{ plan.nom }}</h3>
+            <div class="flex items-baseline gap-1">
+              <span class="font-display text-4xl text-white tracking-wider">{{ plan.prix }}</span>
+              <span class="text-slate-400 text-sm">FCFA / {{ plan.duree_jours }}j</span>
+            </div>
+            {% if plan.description %}
+              <p class="text-slate-400 text-sm mt-2">{{ plan.description }}</p>
+            {% endif %}
+          </div>
+
+          <ul class="space-y-2.5 mb-6 flex-1">
+            {% for feature in plan.fonctionnalites %}
+              <li class="flex items-center gap-2 text-sm text-slate-300">
+                <span class="text-brand-400 flex-shrink-0">{% icon "check" "w-4 h-4" %}</span>
+                {{ feature }}
+              </li>
+            {% endfor %}
+          </ul>
+
+          <a href="{% url 'vip:souscrire' plan.slug %}"
+             class="block text-center py-3 rounded-xl font-bold text-sm transition-all
+             {% if plan.populaire %}bg-yellow-500 hover:bg-yellow-400 text-dark-950{% else %}border border-slate-600 text-white hover:border-yellow-500 hover:text-yellow-400{% endif %}">
+            Souscrire
+          </a>
+        </div>
+      {% empty %}
+        <div class="col-span-3 text-center py-12 text-slate-500">Plans bientot disponibles.</div>
+      {% endfor %}
+    </div>
+
+    <div class="mt-10 text-center">
+      <p class="text-slate-500 text-sm mb-3">Methodes de paiement acceptees</p>
+      <div class="flex justify-center items-center gap-6 text-sm text-slate-400">
+        <span class="inline-flex items-center gap-1">{% icon "phone" "w-4 h-4" %} MTN Mobile Money</span>
+        <span class="inline-flex items-center gap-1">{% icon "phone" "w-4 h-4" %} Moov Money</span>
+        <span class="inline-flex items-center gap-1">{% icon "card" "w-4 h-4" %} Carte bancaire</span>
+        <span class="inline-flex items-center gap-1">{% icon "shield" "w-4 h-4" %} Crypto</span>
+      </div>
+    </div>
+
+    {% if pronos_vip %}
+      <div class="mt-16">
+        <h2 class="font-display text-2xl tracking-wider text-white text-center mb-6">APERCU DES PRONOSTICS VIP</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {% for prono in pronos_vip %}
+            <div class="bg-dark-800/60 border border-yellow-700/30 rounded-2xl p-5">
+              <div class="badge-vip text-xs px-2.5 py-1 rounded-full font-bold inline-flex items-center gap-1 mb-3">{% icon "crown" "w-3 h-3" %} VIP</div>
+              <h3 class="font-semibold text-white mb-2 line-clamp-2">{{ prono.titre }}</h3>
+              <div class="flex items-center gap-3 text-sm mb-3">
+                <span class="text-yellow-400 font-bold">Cote: {{ prono.cote }}</span>
+                <span class="text-slate-400">{{ prono.prediction }}</span>
+              </div>
+              <div class="text-slate-500 text-xs italic inline-flex items-center gap-1">{% icon "lock" "w-3 h-3" %} Analyse disponible pour les membres VIP</div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

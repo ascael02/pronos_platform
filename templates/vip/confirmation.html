@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load icons %}
+{% block title %}Abonnement activé ! — PronosPlatform{% endblock %}
+{% block content %}
+<div class="min-h-[80vh] flex items-center justify-center px-4 py-16">
+  <div class="w-full max-w-md text-center">
+    <div class="flex justify-center text-brand-400 mb-6 animate-bounce">{% icon "spark" "w-16 h-16" %}</div>
+    <h1 class="font-display text-4xl tracking-wider text-white mb-3">BIENVENUE AU VIP !</h1>
+    <p class="text-slate-400 mb-6">
+      Votre abonnement <strong class="text-yellow-400">{{ abonnement.plan.nom }}</strong> est actif jusqu'au
+      <strong class="text-white">{{ abonnement.date_fin|date:"d/m/Y" }}</strong>.
+    </p>
+    <div class="bg-dark-800/60 border border-yellow-700/30 rounded-2xl p-6 mb-6 text-left">
+      <div class="flex justify-between text-sm mb-2">
+        <span class="text-slate-400">Référence</span>
+        <span class="text-white font-mono">{{ abonnement.reference_paiement|default:"—" }}</span>
+      </div>
+      <div class="flex justify-between text-sm mb-2">
+        <span class="text-slate-400">Montant payé</span>
+        <span class="text-yellow-400 font-bold">{{ abonnement.montant_paye }} FCFA</span>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-slate-400">Méthode</span>
+        <span class="text-white">{{ abonnement.get_methode_paiement_display }}</span>
+      </div>
+    </div>
+    <div class="flex flex-col gap-3">
+      <a href="{% url 'pronostics:liste' %}?vip=1" class="py-3 bg-yellow-500 hover:bg-yellow-400 text-dark-950 rounded-xl font-bold transition-colors">
+        {% icon "crown" "w-4 h-4 inline-block align-[-2px]" %} Voir les pronostics VIP
+      </a>
+      <a href="{% url 'pronostics:dashboard' %}" class="py-3 border border-slate-600 text-slate-300 hover:border-slate-500 rounded-xl text-sm transition-colors">
+        Mon dashboard
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

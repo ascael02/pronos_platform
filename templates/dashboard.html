@@ -1,0 +1,104 @@
+
+{% extends 'base.html' %}
+{% load icons %}
+{% block title %}Mon Dashboard — PronosPlatform{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-10">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="font-display text-3xl tracking-wider text-white">
+        BONJOUR, {{ user.username|upper }}
+      </h1>
+      <p class="text-slate-400 text-sm mt-1">
+        Membre depuis {{ user.date_joined|date:"F Y" }}
+        {% if user_is_vip %}
+          / <span class="text-yellow-400 font-medium inline-flex items-center gap-1">{% icon "crown" "w-4 h-4" %} VIP jusqu'au {{ vip_expiry|date:"d/m/Y" }}</span>
+        {% endif %}
+      </p>
+    </div>
+    {% if not user_is_vip %}
+      <a href="{% url 'vip:landing' %}" class="px-4 py-2 border border-yellow-500/50 text-yellow-400 hover:bg-yellow-500/10 rounded-xl text-sm font-medium transition-all">
+        {% icon "crown" "w-4 h-4 inline-block align-[-2px]" %} Passer VIP
+      </a>
+    {% endif %}
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-6">
+    <!-- Statut -->
+    <div class="bg-dark-800/60 border border-slate-700 rounded-2xl p-6">
+      <h3 class="font-semibold text-white mb-4 flex items-center gap-2">{% icon "user" "w-5 h-5" %} Mon statut</h3>
+      <div class="flex items-center gap-3 mb-4">
+        <img src="{{ user.avatar_url }}" alt="" class="w-14 h-14 rounded-full object-cover border-2 border-slate-600">
+        <div>
+          <div class="font-semibold text-white">{{ user.get_full_name|default:user.username }}</div>
+          <div class="text-slate-400 text-sm">{{ user.email }}</div>
+          <div class="mt-1">
+            {% if user_is_vip %}
+              <span class="badge-vip text-xs px-2.5 py-1 rounded-full font-bold inline-flex items-center gap-1">{% icon "crown" "w-3 h-3" %} VIP</span>
+            {% else %}
+              <span class="text-xs px-2.5 py-1 rounded-full bg-slate-700 text-slate-400">Plan Gratuit</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <a href="{% url 'accounts:profil' %}" class="block text-center py-2 border border-slate-600 text-slate-300 hover:border-slate-500 rounded-xl text-sm transition-colors">
+        Modifier mon profil →
+      </a>
+    </div>
+
+    <!-- Notifications -->
+    <div class="bg-dark-800/60 border border-slate-700 rounded-2xl p-6">
+      <h3 class="font-semibold text-white mb-4 flex items-center gap-2">{% icon "bell" "w-5 h-5" %} Notifications <span class="text-xs text-slate-500 font-normal">({{ notifications.count }} non lues)</span></h3>
+      {% if notifications %}
+        <div class="space-y-3">
+          {% for notif in notifications %}
+            <div class="flex items-start gap-3 p-3 rounded-xl bg-dark-900/50">
+              <span class="flex-shrink-0">{% if notif.type_notif == 'success' %}{% icon "check" "w-5 h-5" %}{% elif notif.type_notif == 'warning' %}{% icon "alert" "w-5 h-5" %}{% else %}{% icon "info" "w-5 h-5" %}{% endif %}</span>
+              <div>
+                <div class="text-sm font-medium text-white">{{ notif.titre }}</div>
+                <div class="text-xs text-slate-400 mt-0.5">{{ notif.message }}</div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-slate-500 text-sm text-center py-4">Aucune notification.</p>
+      {% endif %}
+    </div>
+
+    <!-- Accès rapide -->
+    <div class="bg-dark-800/60 border border-slate-700 rounded-2xl p-6">
+      <h3 class="font-semibold text-white mb-4 flex items-center gap-2">{% icon "spark" "w-5 h-5" %} Accès rapide</h3>
+      <div class="space-y-2">
+        <a href="{% url 'pronostics:liste' %}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800/50 transition-colors text-sm text-slate-300">
+          <span>{% icon "chart" "w-5 h-5" %}</span> Voir les pronostics
+        </a>
+        <a href="{% url 'pronostics:stats' %}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800/50 transition-colors text-sm text-slate-300">
+          <span>{% icon "chart" "w-5 h-5" %}</span> Statistiques
+        </a>
+        <a href="{% url 'vip:landing' %}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800/50 transition-colors text-sm text-slate-300">
+          <span>{% icon "crown" "w-5 h-5" %}</span> Offres VIP
+        </a>
+        {% if user.is_staff %}
+          <a href="/admin/" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800/50 transition-colors text-sm text-yellow-400">
+            <span>{% icon "dashboard" "w-5 h-5" %}</span> Administration
+          </a>
+          <a href="{% url 'pronostics:creer' %}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800/50 transition-colors text-sm text-brand-400">
+            <span>{% icon "chevron-plus" "w-5 h-5" %}</span> Nouveau pronostic
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Derniers pronostics -->
+  <div class="mt-8">
+    <h2 class="font-semibold text-white mb-4 flex items-center gap-2">{% icon "flame" "w-5 h-5" %} Derniers pronostics</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {% for prono in pronostics_recents %}
+        {% include 'partials/prono_card.html' with prono=prono %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

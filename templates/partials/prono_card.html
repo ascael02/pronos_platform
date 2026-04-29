@@ -1,0 +1,75 @@
+{% load icons %}
+<article class="bg-dark-800/60 border border-slate-700 rounded-2xl p-5 card-hover flex flex-col gap-3">
+  <div class="flex items-start justify-between gap-2">
+    <div class="flex flex-wrap items-center gap-1.5">
+      {% if prono.est_vip %}
+        <span class="badge-vip text-xs px-2 py-0.5 rounded-full font-bold inline-flex items-center gap-1">{% icon "crown" "w-3 h-3" %} VIP</span>
+      {% endif %}
+      <span class="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+        {% icon prono.match.competition.sport.icone "w-3 h-3" %} {{ prono.match.competition.nom }}
+      </span>
+    </div>
+    {% if prono.resultat == 'win' %}
+      <span class="badge-win text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0 inline-flex items-center gap-1">{% icon "check" "w-3 h-3" %} Gagné</span>
+    {% elif prono.resultat == 'loss' %}
+      <span class="badge-loss text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0 inline-flex items-center gap-1">{% icon "x" "w-3 h-3" %} Perdu</span>
+    {% elif prono.resultat == 'void' %}
+      <span class="text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0 bg-gray-700/50 text-gray-400 border border-gray-600">Remb.</span>
+    {% else %}
+      <span class="badge-pending text-xs px-2.5 py-1 rounded-full font-semibold flex-shrink-0">Attente</span>
+    {% endif %}
+  </div>
+
+  <div class="text-center py-3 bg-dark-900/50 rounded-xl">
+    <div class="font-semibold text-white text-sm">
+      {{ prono.match.equipe_domicile }}
+      <span class="text-slate-500 mx-2 font-normal">vs</span>
+      {{ prono.match.equipe_exterieur }}
+    </div>
+    <div class="text-slate-500 text-xs mt-1">
+      {{ prono.match.date_match|date:"d/m/Y à H:i" }}
+    </div>
+    {% if prono.match.termine and prono.match.score_domicile is not None %}
+      <div class="text-brand-400 font-bold text-lg mt-1">{{ prono.match.score_display }}</div>
+    {% endif %}
+  </div>
+
+  <h3 class="font-semibold text-white line-clamp-2 leading-snug">
+    <a href="{{ prono.get_absolute_url }}" class="hover:text-brand-400 transition-colors">
+      {{ prono.titre }}
+    </a>
+  </h3>
+
+  <div class="flex items-center gap-4">
+    <div class="text-center">
+      <div class="text-brand-400 font-bold text-lg">{{ prono.prediction }}</div>
+      <div class="text-slate-500 text-xs">Prediction</div>
+    </div>
+    <div class="w-px h-8 bg-slate-700"></div>
+    <div class="text-center">
+      <div class="text-white font-bold text-lg">{{ prono.cote }}</div>
+      <div class="text-slate-500 text-xs">Cote</div>
+    </div>
+    <div class="w-px h-8 bg-slate-700"></div>
+    <div class="text-center flex-1">
+      <div class="flex gap-0.5 justify-center">
+        {% for i in "12345" %}
+          <span class="{% if forloop.counter <= prono.confiance %}text-yellow-400{% else %}text-slate-700{% endif %}">{% icon "star" "w-3 h-3" %}</span>
+        {% endfor %}
+      </div>
+      <div class="text-slate-500 text-xs">Confiance</div>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between pt-2 border-t border-slate-700/50">
+    <div class="flex items-center gap-2 text-xs text-slate-500">
+      <span class="inline-flex items-center gap-1">{% icon "user" "w-3 h-3" %} {{ prono.auteur.username }}</span>
+      <span>/</span>
+      <span>{{ prono.created_at|timesince }} ago</span>
+    </div>
+    <a href="{{ prono.get_absolute_url }}"
+       class="text-xs text-brand-400 hover:text-brand-300 font-medium flex items-center gap-1 transition-colors">
+      Analyse <span>&rarr;</span>
+    </a>
+  </div>
+</article>

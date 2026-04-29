@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load icons %}
+{% block title %}{{ bk.nom }} — Avis et Bonus — PronosPlatform{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-10">
+  <nav class="text-xs text-slate-500 flex items-center gap-2 mb-6">
+    <a href="{% url 'pronostics:home' %}" class="hover:text-brand-400">Accueil</a>
+    <span>/</span>
+    <a href="{% url 'bookmakers:liste' %}" class="hover:text-brand-400">Bookmakers</a>
+    <span>/</span>
+    <span class="text-slate-400">{{ bk.nom }}</span>
+  </nav>
+
+  <div class="bg-dark-800/60 border border-slate-700 rounded-2xl overflow-hidden">
+    <div class="p-8 border-b border-slate-700">
+      <div class="flex flex-col md:flex-row items-start gap-6">
+        {% if bk.logo %}
+          <img src="{{ bk.logo.url }}" alt="{{ bk.nom }}" class="h-16 object-contain">
+        {% else %}
+          <div class="text-slate-300">{% icon "bank" "w-12 h-12" %}</div>
+        {% endif %}
+        <div class="flex-1">
+          <h1 class="font-bold text-white text-2xl mb-2">{{ bk.nom }}</h1>
+          <div class="flex gap-0.5 mb-3">
+            {% for i in "12345" %}
+              <span class="{% if forloop.counter <= bk.note %}text-yellow-400{% else %}text-slate-700{% endif %}">{% icon "star" "w-5 h-5" %}</span>
+            {% endfor %}
+            <span class="text-slate-400 text-sm ml-2">{{ bk.note }}/5</span>
+          </div>
+          {% if bk.description %}
+            <p class="text-slate-400 text-sm leading-relaxed">{{ bk.description }}</p>
+          {% endif %}
+        </div>
+        <a href="{% url 'bookmakers:affilie' bk.slug %}" target="_blank"
+           class="px-6 py-3 bg-brand-600 hover:bg-brand-500 text-white rounded-xl font-bold transition-colors flex-shrink-0">
+          Profiter du bonus →
+        </a>
+      </div>
+    </div>
+
+    <div class="p-8 grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div class="text-center">
+        <div class="text-brand-400 font-bold text-xl">{{ bk.bonus_montant }}</div>
+        <div class="text-slate-400 text-xs mt-1">{{ bk.get_bonus_type_display }}</div>
+      </div>
+      <div class="text-center">
+        <div class="text-white font-bold text-xl">{{ bk.fiabilite }}%</div>
+        <div class="text-slate-400 text-xs mt-1">Fiabilité</div>
+      </div>
+      <div class="text-center">
+        <span class="{% if bk.disponible_benin %}text-green-400{% else %}text-red-400{% endif %} font-bold">
+          {% if bk.disponible_benin %}{% icon "check" "w-4 h-4 inline-block align-[-2px]" %} Oui{% else %}{% icon "x" "w-4 h-4 inline-block align-[-2px]" %} Non{% endif %}
+        </span>
+        <div class="text-slate-400 text-xs mt-1">Disponible Bénin</div>
+      </div>
+      <div class="text-center">
+        <span class="{% if bk.accepte_mobile_money %}text-green-400{% else %}text-red-400{% endif %} font-bold">
+          {% if bk.accepte_mobile_money %}{% icon "check" "w-4 h-4 inline-block align-[-2px]" %} Oui{% else %}{% icon "x" "w-4 h-4 inline-block align-[-2px]" %} Non{% endif %}
+        </span>
+        <div class="text-slate-400 text-xs mt-1">Mobile Money</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

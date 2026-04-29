@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load icons %}
+{% block title %}Pronostics Sportifs — PronosPlatform{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-10">
+
+  <!-- Titre + Filtres -->
+  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+    <div>
+      <h1 class="font-display text-4xl tracking-wider text-white">PRONOSTICS</h1>
+      <p class="text-slate-400 text-sm mt-1">{{ page_obj.paginator.count }} pronostic{{ page_obj.paginator.count|pluralize }} disponible{{ page_obj.paginator.count|pluralize }}</p>
+    </div>
+
+    <!-- Search -->
+    <form method="get" class="flex gap-2">
+      <input type="text" name="q" value="{{ search }}" placeholder="Rechercher…"
+             class="px-4 py-2.5 bg-dark-800 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 w-64">
+      <button type="submit" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-sm font-medium transition-colors">
+        {% icon "search" "w-4 h-4" %}
+      </button>
+    </form>
+  </div>
+
+  <!-- Filtres sports -->
+  <div class="flex gap-2 flex-wrap mb-6">
+    <a href="{% url 'pronostics:liste' %}" 
+       class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all {% if not sport_actif %}bg-brand-600 text-white{% else %}bg-dark-800 text-slate-400 border border-slate-700 hover:border-slate-500{% endif %}">
+      Tous
+    </a>
+    {% for sport in sports %}
+      <a href="?sport={{ sport.slug }}" 
+         class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all {% if sport_actif == sport.slug %}bg-brand-600 text-white{% else %}bg-dark-800 text-slate-400 border border-slate-700 hover:border-slate-500{% endif %}">
+        {{ sport.icone }} {{ sport.nom }}
+      </a>
+    {% endfor %}
+  </div>
+
+  <!-- Filtres résultats -->
+  <div class="flex gap-2 mb-8">
+    {% for val, label, cls in resultats_filter %}{% endfor %}
+    <a href="?{% if sport_actif %}sport={{ sport_actif }}&{% endif %}resultat=pending" class="px-3 py-1 rounded-lg text-xs border {% if resultat_actif == 'pending' %}badge-pending{% else %}border-slate-700 text-slate-400{% endif %}">⏳ En attente</a>
+    <a href="?{% if sport_actif %}sport={{ sport_actif }}&{% endif %}resultat=win"     class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs border {% if resultat_actif == 'win' %}badge-win{% else %}border-slate-700 text-slate-400{% endif %}">{% icon "check" "w-3 h-3" %} Gagnés</a>
+    <a href="?{% if sport_actif %}sport={{ sport_actif }}&{% endif %}resultat=loss"    class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs border {% if resultat_actif == 'loss' %}badge-loss{% else %}border-slate-700 text-slate-400{% endif %}">{% icon "x" "w-3 h-3" %} Perdus</a>
+    {% if resultat_actif or sport_actif or search %}
+      <a href="{% url 'pronostics:liste' %}" class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs border border-slate-700 text-slate-500 hover:text-white">{% icon "x" "w-3 h-3" %} Réinitialiser</a>
+    {% endif %}
+  </div>
+
+  <!-- Grille -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    {% for prono in page_obj %}
+      {% include 'partials/prono_card.html' with prono=prono %}
+    {% empty %}
+      <div class="col-span-3 text-center py-16">
+        <div class="flex justify-center text-slate-500 mb-4">{% icon "search" "w-12 h-12" %}</div>
+        <p class="text-slate-400">Aucun pronostic trouvé pour ces critères.</p>
+        <a href="{% url 'pronostics:liste' %}" class="mt-4 inline-block text-brand-400 hover:text-brand-300 text-sm">Réinitialiser les filtres</a>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+    <div class="flex justify-center gap-2 mt-10">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 bg-dark-800 border border-slate-700 rounded-xl text-sm text-slate-300 hover:border-brand-500 transition-colors">← Précédent</a>
+      {% endif %}
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <span class="px-4 py-2 bg-brand-600 rounded-xl text-sm text-white font-medium">{{ num }}</span>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a href="?page={{ num }}" class="px-4 py-2 bg-dark-800 border border-slate-700 rounded-xl text-sm text-slate-300 hover:border-brand-500 transition-colors">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 bg-dark-800 border border-slate-700 rounded-xl text-sm text-slate-300 hover:border-brand-500 transition-colors">Suivant →</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

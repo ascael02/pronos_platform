@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load icons %}
+{% block title %}Statistiques — PronosPlatform{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-10">
+
+  <div class="mb-10">
+    <h1 class="font-display text-4xl tracking-wider text-white">STATISTIQUES</h1>
+    <p class="text-slate-400 text-sm mt-1">Transparence totale sur nos performances</p>
+  </div>
+
+  <!-- KPI globaux -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+    <div class="bg-dark-800/60 border border-slate-700 rounded-2xl p-6 text-center">
+      <div class="font-display text-5xl text-brand-400 tracking-wider">{{ taux }}%</div>
+      <div class="text-slate-400 text-sm mt-1">Taux de réussite global</div>
+      <div class="mt-3 h-2 bg-slate-700 rounded-full overflow-hidden">
+        <div class="h-full bg-gradient-to-r from-brand-600 to-brand-400 rounded-full transition-all" style="width:{{ taux }}%"></div>
+      </div>
+    </div>
+    <div class="bg-dark-800/60 border border-slate-700 rounded-2xl p-6 text-center">
+      <div class="font-display text-5xl text-white tracking-wider">{{ total }}</div>
+      <div class="text-slate-400 text-sm mt-1">Pronostics analysés</div>
+      <div class="mt-3 text-brand-400">{% icon "chart" "w-7 h-7" %}</div>
+    </div>
+    <div class="bg-green-900/20 border border-green-700/30 rounded-2xl p-6 text-center">
+      <div class="font-display text-5xl text-green-400 tracking-wider">{{ wins }}</div>
+      <div class="text-slate-400 text-sm mt-1">Pronostics gagnés</div>
+      <div class="mt-3 text-brand-400">{% icon "check" "w-7 h-7" %}</div>
+    </div>
+    <div class="bg-red-900/10 border border-red-700/20 rounded-2xl p-6 text-center">
+      <div class="font-display text-5xl text-red-400 tracking-wider">{{ losses }}</div>
+      <div class="text-slate-400 text-sm mt-1">Pronostics perdus</div>
+      <div class="mt-3 text-red-400">{% icon "x" "w-7 h-7" %}</div>
+    </div>
+  </div>
+
+  <!-- Stats par sport -->
+  <div class="bg-dark-800/60 border border-slate-700 rounded-2xl p-6 mb-8">
+    <h2 class="font-semibold text-white mb-6 flex items-center gap-2">{% icon "chart" "w-5 h-5" %} Performance par sport</h2>
+    <div class="space-y-4">
+      {% for s in stats_sports %}
+        {% if s.total > 0 %}
+          <div class="flex items-center gap-4">
+            <div class="w-32 flex items-center gap-2 text-sm text-slate-300 flex-shrink-0">
+              {{ s.sport.icone }} {{ s.sport.nom }}
+            </div>
+            <div class="flex-1 h-6 bg-slate-700 rounded-full overflow-hidden relative">
+              <div class="h-full rounded-full transition-all duration-1000
+                {% if s.taux >= 60 %}bg-gradient-to-r from-green-600 to-green-400
+                {% elif s.taux >= 40 %}bg-gradient-to-r from-yellow-600 to-yellow-400
+                {% else %}bg-gradient-to-r from-red-600 to-red-400{% endif %}"
+                style="width: {{ s.taux }}%">
+              </div>
+            </div>
+            <div class="w-28 flex items-center justify-between text-sm flex-shrink-0">
+              <span class="font-bold {% if s.taux >= 60 %}text-green-400{% elif s.taux >= 40 %}text-yellow-400{% else %}text-red-400{% endif %}">
+                {{ s.taux }}%
+              </span>
+              <span class="text-slate-500 text-xs">{{ s.wins }}/{{ s.total }}</span>
+            </div>
+          </div>
+        {% endif %}
+      {% empty %}
+        <p class="text-slate-500 text-center py-8">Aucune statistique disponible.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Historique mensuel -->
+  {% if historique %}
+    <div class="bg-dark-800/60 border border-slate-700 rounded-2xl p-6">
+      <h2 class="font-semibold text-white mb-6 flex items-center gap-2">{% icon "calendar" "w-5 h-5" %} Historique mensuel</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-xs text-slate-500 uppercase border-b border-slate-700">
+              <th class="text-left pb-3 pr-6">Mois</th>
+              <th class="text-center pb-3 pr-6">Total</th>
+              <th class="text-center pb-3 pr-6">Gagnés</th>
+              <th class="text-center pb-3 pr-6">Perdus</th>
+              <th class="text-left pb-3">Taux de réussite</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-700/50">
+            {% for h in historique %}
+              {% with taux_m=h.wins|floatformat:0 %}
+              <tr class="hover:bg-slate-800/30">
+                <td class="py-3 pr-6 text-slate-300 font-medium">{{ h.mois|date:"F Y" }}</td>
+                <td class="py-3 pr-6 text-center text-white">{{ h.total }}</td>
+                <td class="py-3 pr-6 text-center text-green-400 font-medium">{{ h.wins }}</td>
+                <td class="py-3 pr-6 text-center text-red-400 font-medium">{{ h.total|add:h.wins|add:"-"|add:h.wins }}</td>
+                <td class="py-3">
+                  {% if h.total > 0 %}
+                    {% widthratio h.wins h.total 100 as pct %}
+                    <div class="flex items-center gap-3">
+                      <div class="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden max-w-xs">
+                        <div class="h-full {% if pct >= 60 %}bg-green-500{% elif pct >= 40 %}bg-yellow-500{% else %}bg-red-500{% endif %} rounded-full" style="width:{{ pct }}%"></div>
+                      </div>
+                      <span class="text-xs {% if pct >= 60 %}text-green-400{% elif pct >= 40 %}text-yellow-400{% else %}text-red-400{% endif %} font-medium w-10">{{ pct }}%</span>
+                    </div>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endwith %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Disclaimer -->
+  <div class="mt-8 p-4 border border-slate-700 rounded-xl bg-slate-800/30">
+    <p class="text-slate-500 text-xs text-center leading-relaxed">
+      {% icon "alert" "w-4 h-4 inline-block align-[-2px]" %} Les statistiques sont calculées sur l'ensemble des pronostics publiés sur la plateforme. Les performances passées ne garantissent pas les résultats futurs. Jouez responsablement.
+    </p>
+  </div>
+</div>
+{% endblock %}
