@@ -68,7 +68,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'crispy_forms',
     'crispy_tailwind',
-    'django_ckeditor_5',
+    'django_ckeditor',
     'taggit',
     'django_filters',
     'import_export',
