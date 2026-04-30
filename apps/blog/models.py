@@ -5,7 +5,7 @@ Modèles pour le blog SEO de la plateforme.
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
-from django_ckeditor_5.fields import CKEditor5Field
+from ckeditor.fields import RichTextField
 from taggit.managers import TaggableManager
 from apps.accounts.models import User
 
@@ -46,7 +46,7 @@ class Article(models.Model):
     titre = models.CharField(max_length=300, verbose_name="Titre")
     slug = models.SlugField(max_length=350, unique=True, blank=True)
     extrait = models.TextField(max_length=500, verbose_name="Extrait / Introduction")
-    contenu = CKEditor5Field(verbose_name="Contenu", config_name='default')
+    contenu = RichTextField(verbose_name="Contenu", config_name='default')
     image_principale = models.ImageField(
         upload_to='blog/', null=True, blank=True, verbose_name="Image principale"
     )
