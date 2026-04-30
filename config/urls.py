@@ -19,7 +19,6 @@ urlpatterns = [
 
     # API
     path('api/v1/', include('apps.api.urls')),
-    path('ckeditor5/', include('django_ckeditor_5.urls')),
 
     # Docs (remplacement Swagger)
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
