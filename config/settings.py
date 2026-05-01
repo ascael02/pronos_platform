@@ -11,10 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ─────────────────────────────
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-SECRET_KEY = config(
-    "SECRET_KEY",
-    default="django-insecure-dev-key"
-)
+SECRET_KEY = config("SECRET_KEY")
 
 ALLOWED_HOSTS = config(
     "ALLOWED_HOSTS",
@@ -24,7 +21,7 @@ ALLOWED_HOSTS = config(
 
 
 # ─────────────────────────────
-# APPS
+# APPLICATIONS
 # ─────────────────────────────
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -33,15 +30,15 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
 
-    # Third party
+    # third party
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
     "crispy_forms",
     "crispy_tailwind",
 
-    # CKEditor 4 (stable)
     "ckeditor",
     "ckeditor_uploader",
 
@@ -50,7 +47,7 @@ INSTALLED_APPS = [
     "import_export",
     "drf_spectacular",
 
-    # Apps
+    # apps
     "apps.accounts",
     "apps.pronostics",
     "apps.bookmakers",
@@ -68,6 +65,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
 
     "django.contrib.sessions.middleware.SessionMiddleware",
+
     "corsheaders.middleware.CorsMiddleware",
 
     "django.middleware.common.CommonMiddleware",
@@ -81,6 +79,8 @@ MIDDLEWARE = [
 
 
 ROOT_URLCONF = "config.urls"
+WSGI_APPLICATION = "config.wsgi.application"
+SITE_ID = 1
 
 
 # ─────────────────────────────
@@ -100,9 +100,6 @@ TEMPLATES = [
         },
     },
 ]
-
-
-WSGI_APPLICATION = "config.wsgi.application"
 
 
 # ─────────────────────────────
@@ -166,6 +163,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # DRF
 # ─────────────────────────────
 REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
@@ -186,19 +184,23 @@ SIMPLE_JWT = {
 
 
 # ─────────────────────────────
-# CORS / CSRF FIX IMPORTANT
+# CORS / CSRF FIX
 # ─────────────────────────────
-CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="", cast=Csv())
-
-CSRF_TRUSTED_ORIGINS = config(
-    "CSRF_TRUSTED_ORIGINS",
-    default="https://*.onrender.com,https://*.railway.app",
+CORS_ALLOWED_ORIGINS = config(
+    "CORS_ALLOWED_ORIGINS",
+    default="",
     cast=Csv()
 )
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://pronos-platform-2.onrender.com",
+    "https://pronos-platform-1.onrender.com",
+    "https://web-production-b2e88f.up.railway.app",
+]
+
 
 # ─────────────────────────────
-# CKEDITOR (FIX SIMPLE)
+# CKEDITOR
 # ─────────────────────────────
 CKEDITOR_UPLOAD_PATH = "uploads/"
 
@@ -212,8 +214,11 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # ─────────────────────────────
 # SECURITY PRODUCTION
 # ─────────────────────────────
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
+
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
@@ -222,6 +227,10 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = True
 
     SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
-    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-
     X_FRAME_OPTIONS = "DENY"
+
+
+# ─────────────────────────────
+# DEFAULT
+# ─────────────────────────────
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
