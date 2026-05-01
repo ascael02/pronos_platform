@@ -9,7 +9,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ─────────────────────────────
 # SECURITY
 # ─────────────────────────────
-DEBUG = config("DEBUG", default=False, cast=bool)
+def config_bool(name, default=False):
+    value = config(name, default=default)
+    if isinstance(value, bool):
+        return value
+
+    normalized = str(value).strip().lower()
+    if normalized in {"1", "true", "yes", "on", "debug", "development", "dev"}:
+        return True
+    if normalized in {"0", "false", "no", "off", "release", "production", "prod", ""}:
+        return False
+    raise ValueError(f"Invalid boolean value for {name}: {value}")
+
+
+DEBUG = config_bool("DEBUG", default=False)
 
 SECRET_KEY = config("SECRET_KEY")
 
@@ -192,11 +205,11 @@ CORS_ALLOWED_ORIGINS = config(
     cast=Csv()
 )
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://pronos-platform-2.onrender.com",
-    "https://pronos-platform-1.onrender.com",
-    "https://web-production-b2e88f.up.railway.app",
-]
+CSRF_TRUSTED_ORIGINS = config(
+    "CSRF_TRUSTED_ORIGINS",
+    default="https://pronos-platform-2.onrender.com,https://pronos-platform-1.onrender.com,https://web-production-b2e88f.up.railway.app",
+    cast=Csv(),
+)
 
 
 # ─────────────────────────────

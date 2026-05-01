@@ -13,7 +13,7 @@ env/
 db.sqlite3
 staticfiles/
 media/
-{config,apps/
+[{]config,apps/
 
 # Local tooling
 .DS_Store
