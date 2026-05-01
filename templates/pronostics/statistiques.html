@@ -90,7 +90,7 @@
                 <td class="py-3 pr-6 text-slate-300 font-medium">{{ h.mois|date:"F Y" }}</td>
                 <td class="py-3 pr-6 text-center text-white">{{ h.total }}</td>
                 <td class="py-3 pr-6 text-center text-green-400 font-medium">{{ h.wins }}</td>
-                <td class="py-3 pr-6 text-center text-red-400 font-medium">{{ h.total|add:h.wins|add:"-"|add:h.wins }}</td>
+                <td class="py-3 pr-6 text-center text-red-400 font-medium">{{ h.losses }}</td>
                 <td class="py-3">
                   {% if h.total > 0 %}
                     {% widthratio h.wins h.total 100 as pct %}

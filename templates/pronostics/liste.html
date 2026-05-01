@@ -38,7 +38,6 @@
 
   <!-- Filtres résultats -->
   <div class="flex gap-2 mb-8">
-    {% for val, label, cls in resultats_filter %}{% endfor %}
     <a href="?{% if sport_actif %}sport={{ sport_actif }}&{% endif %}resultat=pending" class="px-3 py-1 rounded-lg text-xs border {% if resultat_actif == 'pending' %}badge-pending{% else %}border-slate-700 text-slate-400{% endif %}">⏳ En attente</a>
     <a href="?{% if sport_actif %}sport={{ sport_actif }}&{% endif %}resultat=win"     class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs border {% if resultat_actif == 'win' %}badge-win{% else %}border-slate-700 text-slate-400{% endif %}">{% icon "check" "w-3 h-3" %} Gagnés</a>
     <a href="?{% if sport_actif %}sport={{ sport_actif }}&{% endif %}resultat=loss"    class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs border {% if resultat_actif == 'loss' %}badge-loss{% else %}border-slate-700 text-slate-400{% endif %}">{% icon "x" "w-3 h-3" %} Perdus</a>

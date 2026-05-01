@@ -47,12 +47,13 @@
                 <div class="flex items-center gap-3">
                   {{ field }}
                 </div>
+              {% elif field.name == 'bio' %}
+                <textarea name="{{ field.html_name }}"
+                          class="w-full px-4 py-3 bg-dark-900 border {% if field.errors %}border-red-500{% else %}border-slate-700{% endif %} rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors min-h-[100px]">{{ field.value|default_if_none:'' }}</textarea>
               {% else %}
                 <input type="{{ field.field.widget.input_type }}" name="{{ field.html_name }}"
                        value="{% if field.value %}{{ field.value }}{% endif %}"
-                       class="w-full px-4 py-3 bg-dark-900 border {% if field.errors %}border-red-500{% else %}border-slate-700{% endif %} rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors
-                              {% if field.name == 'bio' %}min-h-[80px]{% endif %}"
-                       {% if field.name == 'bio' %}{% endif %}>
+                       class="w-full px-4 py-3 bg-dark-900 border {% if field.errors %}border-red-500{% else %}border-slate-700{% endif %} rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-colors">
               {% endif %}
               {% for err in field.errors %}
                 <p class="mt-1 text-xs text-red-400">{{ err }}</p>

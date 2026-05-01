@@ -214,7 +214,8 @@ def statistiques(request):
         mois=TruncMonth('created_at')
     ).values('mois').annotate(
         total=Count('id'),
-        wins=Sum(Case(When(resultat='win', then=1), output_field=IntegerField(), default=0))
+        wins=Sum(Case(When(resultat='win', then=1), output_field=IntegerField(), default=0)),
+        losses=Sum(Case(When(resultat='loss', then=1), output_field=IntegerField(), default=0)),
     ).order_by('-mois')[:12]
 
     ctx = {
