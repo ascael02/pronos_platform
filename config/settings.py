@@ -32,6 +32,10 @@ ALLOWED_HOSTS = config(
     cast=Csv()
 )
 
+RENDER_EXTERNAL_HOSTNAME = config("RENDER_EXTERNAL_HOSTNAME", default="")
+if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
 
 # ─────────────────────────────
 # APPLICATIONS
@@ -212,6 +216,11 @@ CSRF_TRUSTED_ORIGINS = config(
     default="https://pronos-platform-2.onrender.com,https://pronos-platform-1.onrender.com,https://web-production-b2e88f.up.railway.app",
     cast=Csv(),
 )
+
+if RENDER_EXTERNAL_HOSTNAME:
+    render_origin = f"https://{RENDER_EXTERNAL_HOSTNAME}"
+    if render_origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(render_origin)
 
 
 # ─────────────────────────────
